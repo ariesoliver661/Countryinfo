@@ -4,7 +4,127 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>FIND COUNTRY INFO FOR FREE</title>
-  <link href="style.css" rel="stylesheet" type="text/css" />
+  <style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #000;
+    margin: 0;
+    padding: 0;
+    position: relative;
+}
+
+.logo {
+    display: block;
+    margin: 20px auto;
+    max-width: 300px;
+    height: auto;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 0 5px #0ff) drop-shadow(0 0 10px #0ff);
+}
+
+.guide {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.guide h2 {
+    color: #0ff;
+    font-size: 24px;
+    margin: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 500px;
+    background-color: #000;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+    position: relative;
+    border: 5px solid #0ff;
+    box-shadow: 0 0 30px #0ff;
+    margin: 50px auto 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+input[type="text"] {
+    width: calc(100% - 120px);
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #000;
+    box-sizing: border-box;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s ease;
+    color: #0ff;
+    outline: none;
+}
+
+input[type="text"]:focus {
+    background-color: #333;
+}
+
+button {
+    background-color: #0ff;
+    color: #000;
+    border: none;
+    border-radius: 5px;
+    padding: 15px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
+li {
+    background-color: #000;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+img.country-photo {
+    max-width: 100px;
+    height: auto;
+    border-radius: 5px;
+    margin-left: 20px;
+    border: 2px solid #0ff;
+    box-shadow: 0 0 20px #0ff;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 24px;
+    color: #0ff;
+    margin-bottom: 10px;
+}
+
+p {
+    color: #fff;
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+strong {
+    color: #0ff;
+}
+ </style>
  </head>
  <body>
   <img src="https://i.imgur.com/eeB6BFI.png" alt="World Map Logo" class="logo">
@@ -15,6 +135,44 @@
    <input type="text" id="countryInput" placeholder="Enter a country name"> <button id="searchButton">Search</button>
    <ul id="countryData"></ul>
   </div>
-  <script src="script.js"></script>
+  <script>
+const input = document.getElementById('countryInput');
+const countryData = document.getElementById('countryData');
+const container = document.querySelector('.container');
+const searchButton = document.getElementById('searchButton');
+
+searchButton.addEventListener('click', function() {
+    const searchQuery = input.value.trim();
+    if (searchQuery !== '') {
+        fetch(`https://restcountries.com/v3.1/name/${searchQuery}`)
+            .then(response => response.json())
+            .then(data => {
+                countryData.innerHTML = '';
+                data.forEach(country => {
+                    const { name, capital, population, flags, region, subregion, languages, currencies } = country;
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <div>
+                            <h2>${name.common}</h2>
+                            <p><strong>Subregion:</strong> ${subregion}</p>
+                            <p><strong>Capital:</strong> ${capital}</p>
+                            <p><strong>Population:</strong> ${population.toLocaleString()}</p>
+                            <p><strong>Region:</strong> ${region}</p>
+                            <p><strong>Languages:</strong> ${Object.values(languages).join(', ')}</p>
+                            <p><strong>Currencies:</strong> ${Object.values(currencies).map(currency => `${currency.name} (${currency.symbol})`).join(', ')}</p>
+                        </div>
+                        <img src="${flags.png}" alt="${name.common} Flag" class="country-photo">
+                    `;
+                    countryData.appendChild(listItem);
+                });
+                container.style.overflowY = 'auto';
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    } else {
+        countryData.innerHTML = '';
+        container.style.overflowY = 'hidden';
+    }
+});
+ </script>
  </body>
      </html>
